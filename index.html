@@ -1,0 +1,2006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlantMaxer — Precision Cannabis Grow Log, Genetics Vault &amp; Room Tracker for iOS</title>
+<meta name="description" content="The private iOS app for serious cannabis cultivators and breeders. Track veg and flower days, pH/PPM runoff drift, elemental NPK mg/ppm math, multi-generation strain lineage, seed box vaults, Govee Bluetooth VPD sensors, and Brother DK barcode labels.">
+<meta name="theme-color" content="#0b1911">
+<link rel="icon" type="image/jpeg" href="icon.jpg">
+<link rel="apple-touch-icon" href="icon.jpg">
+<style>
+  :root {
+    --bg-deep: #08130d;
+    --bg-forest: #0f2317;
+    --bg-card: #152d1f;
+    --bg-card-elevated: #1b3827;
+    --cream: #f6f1e6;
+    --cream-card: #ffffff;
+    --cream-page: #f5ede0;
+    --cream-muted: #c2ccb8;
+    --text-dark: #162419;
+    --text-dark-muted: #5a665c;
+    --gold: #e3bf6b;
+    --gold-deep: #b08021;
+    --gold-glow: rgba(227, 191, 107, 0.22);
+    --terracotta: #b55433;
+    --leaf: #3d804a;
+    --leaf-bright: #5ec271;
+    --sage: #7d9973;
+    --flower-purple: #9b30d9;
+    --flower-bg: #f4dffb;
+    --veg-green: #246a34;
+    --veg-bg: #dcf2e1;
+    --border-subtle: rgba(227, 191, 107, 0.16);
+    --border-green: rgba(125, 153, 115, 0.22);
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+    --shadow-xl: 0 28px 70px rgba(0, 0, 0, 0.55);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background: var(--bg-deep);
+    color: var(--cream);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 80% 8%, rgba(227, 191, 107, 0.13) 0%, rgba(15, 35, 23, 0) 42%),
+      radial-gradient(circle at 15% 28%, rgba(61, 128, 74, 0.16) 0%, rgba(8, 19, 13, 0) 48%),
+      var(--bg-deep);
+    color: var(--cream);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+
+  a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: opacity 0.18s ease, color 0.18s ease;
+  }
+  a:hover {
+    opacity: 0.88;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Top Navigation */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    background: rgba(8, 19, 13, 0.82);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+    gap: 16px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--cream);
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .brand img {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(227, 191, 107, 0.35);
+  }
+
+  .brand-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(227, 191, 107, 0.14);
+    color: var(--gold);
+    border: 1px solid rgba(227, 191, 107, 0.3);
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    list-style: none;
+    font-size: 0.94rem;
+    font-weight: 500;
+  }
+
+  .nav-links a {
+    color: var(--cream-muted);
+  }
+  .nav-links a:hover {
+    color: var(--gold);
+    opacity: 1;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 11px 20px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.94rem;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  }
+  .btn:hover {
+    transform: translateY(-1px);
+    opacity: 1;
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, #eccd7c 0%, #c89632 100%);
+    color: #112115;
+    box-shadow: 0 8px 24px rgba(227, 191, 107, 0.25);
+  }
+
+  .btn-outline {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--cream);
+    border: 1px solid var(--border-subtle);
+  }
+  .btn-outline:hover {
+    background: rgba(227, 191, 107, 0.12);
+    border-color: var(--gold);
+  }
+
+  /* Hero Section */
+  .hero {
+    padding: 68px 0 84px;
+    position: relative;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr;
+    gap: 56px;
+    align-items: center;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(61, 128, 74, 0.2);
+    border: 1px solid rgba(94, 194, 113, 0.35);
+    color: #9be7a9;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 4.7vw, 4rem);
+    line-height: 1.07;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    margin-bottom: 22px;
+  }
+
+  .hero h1 .gold-text {
+    background: linear-gradient(135deg, #f7df9c 0%, #d4a13a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-lead {
+    font-size: 1.16rem;
+    color: var(--cream-muted);
+    max-width: 590px;
+    margin-bottom: 30px;
+    line-height: 1.62;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 34px;
+  }
+
+  .hero-pills {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    max-width: 560px;
+  }
+
+  .hero-pill {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: rgba(21, 45, 31, 0.65);
+    border: 1px solid var(--border-green);
+    font-size: 0.87rem;
+  }
+
+  .hero-pill-icon {
+    font-size: 1.15rem;
+    line-height: 1;
+    margin-top: 2px;
+  }
+
+  .hero-pill strong {
+    display: block;
+    color: var(--cream);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .hero-pill span {
+    color: var(--cream-muted);
+    font-size: 0.8rem;
+  }
+
+  /* Interactive iPhone Mockup */
+  .phone-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .phone-glow {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(227, 191, 107, 0.25) 0%, rgba(61, 128, 74, 0.12) 45%, transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .iphone-frame {
+    position: relative;
+    z-index: 1;
+    width: 368px;
+    max-width: 100%;
+    background: #1c1f1d;
+    border-radius: 50px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 2px #3b423d,
+      0 0 0 5px #121714,
+      var(--shadow-xl);
+  }
+
+  .iphone-screen {
+    background: var(--cream-page);
+    color: var(--text-dark);
+    border-radius: 40px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 700px;
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  }
+
+  /* Status Bar & Dynamic Island */
+  .ios-statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #162419;
+  }
+
+  .dynamic-island {
+    width: 96px;
+    height: 25px;
+    background: #0a0c0a;
+    border-radius: 999px;
+  }
+
+  .ios-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px 8px;
+  }
+
+  .ios-circle-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.72);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-deep);
+    font-size: 0.92rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  .ios-pill-actions {
+    display: inline-flex;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.72);
+    padding: 6px 14px;
+    border-radius: 999px;
+    color: var(--gold-deep);
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+
+  .ios-title {
+    font-size: 1.55rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    padding: 0 18px 8px;
+    color: #111d13;
+  }
+
+  .ios-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 14px 16px;
+  }
+
+  .ios-section-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.73rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7267;
+    padding: 8px 6px 5px;
+  }
+
+  .ios-card {
+    background: var(--cream-card);
+    border-radius: 14px;
+    padding: 11px 13px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .ios-row {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0ece1;
+  }
+  .ios-row:first-child { padding-top: 2px; }
+  .ios-row:last-child { border-bottom: none; padding-bottom: 2px; }
+
+  .ios-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+  }
+
+  .ios-plant-name {
+    font-weight: 700;
+    font-size: 0.93rem;
+    color: #132016;
+  }
+
+  .stage-badge {
+    font-size: 0.69rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .stage-flower {
+    background: var(--flower-bg);
+    color: var(--flower-purple);
+  }
+  .stage-veg {
+    background: var(--veg-bg);
+    color: var(--veg-green);
+  }
+
+  .ios-sub {
+    font-size: 0.78rem;
+    color: #5d675e;
+  }
+
+  .ios-meta {
+    font-size: 0.73rem;
+    color: #778178;
+    margin-top: 2px;
+  }
+
+  .ios-cta-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: var(--terracotta);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.86rem;
+    padding: 10px;
+    border-radius: 11px;
+    margin: 8px 0;
+  }
+
+  /* Forest Tab Bar inside iPhone */
+  .ios-tabbar {
+    background: #1f452b;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 7px 6px 14px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .ios-tab {
+    background: none;
+    border: none;
+    color: #b2c7a8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 2px;
+    border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .ios-tab svg {
+    width: 19px;
+    height: 19px;
+    fill: currentColor;
+  }
+  .ios-tab.active {
+    color: var(--gold);
+    background: rgba(227, 191, 107, 0.14);
+  }
+
+  .screen-switcher-caption {
+    margin-top: 14px;
+    font-size: 0.83rem;
+    color: var(--cream-muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  /* Section Headers */
+  section {
+    padding: 84px 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .section-header {
+    max-width: 720px;
+    margin-bottom: 48px;
+  }
+
+  .section-kicker {
+    color: var(--gold);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-size: clamp(1.9rem, 3.3vw, 2.75rem);
+    line-height: 1.13;
+    letter-spacing: -0.025em;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .section-desc {
+    color: var(--cream-muted);
+    font-size: 1.06rem;
+  }
+
+  /* Bento Feature Grid */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 22px;
+  }
+
+  .bento-card {
+    background: linear-gradient(180deg, rgba(27, 56, 39, 0.72) 0%, rgba(16, 35, 24, 0.88) 100%);
+    border: 1px solid var(--border-green);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bento-card:hover {
+    border-color: rgba(227, 191, 107, 0.4);
+  }
+
+  .span-7 { grid-column: span 7; }
+  .span-5 { grid-column: span 5; }
+  .span-6 { grid-column: span 6; }
+  .span-4 { grid-column: span 4; }
+  .span-8 { grid-column: span 8; }
+
+  .card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .bento-card h3 {
+    font-size: 1.42rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.015em;
+  }
+
+  .bento-card p {
+    color: var(--cream-muted);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  /* Mini UI Widgets inside Bento Cards */
+  .mini-ui {
+    background: rgba(8, 19, 13, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    font-size: 0.85rem;
+  }
+
+  .drift-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .drift-box {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 10px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--gold);
+  }
+
+  .drift-box small {
+    display: block;
+    color: var(--cream-muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+  }
+
+  .drift-box strong {
+    font-size: 1.02rem;
+    color: var(--cream);
+  }
+
+  .element-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .el-pill {
+    background: rgba(61, 128, 74, 0.22);
+    border: 1px solid rgba(94, 194, 113, 0.3);
+    color: #c7f5cf;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.77rem;
+    font-weight: 600;
+  }
+
+  /* Pedigree Tree Graphic */
+  .lineage-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.82rem;
+  }
+
+  .tree-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+  }
+  .tree-node.indent-1 { margin-left: 22px; }
+  .tree-node.indent-2 { margin-left: 44px; }
+
+  .sex-f { color: #ff7eb6; font-weight: 700; }
+  .sex-m { color: #6ec2ff; font-weight: 700; }
+
+  .gen-pill {
+    font-size: 0.68rem;
+    font-family: -apple-system, sans-serif;
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: rgba(155, 48, 217, 0.28);
+    color: #e6b8ff;
+    border: 1px solid rgba(155, 48, 217, 0.45);
+  }
+
+  /* Interactive Calculators Section */
+  .calc-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  .calc-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 30px;
+  }
+
+  .calc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .calc-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .unit-toggle {
+    display: inline-flex;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 999px;
+    padding: 3px;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .unit-toggle button {
+    background: none;
+    border: none;
+    color: var(--cream-muted);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 999px;
+    cursor: pointer;
+  }
+  .unit-toggle button.active {
+    background: var(--gold);
+    color: #112115;
+  }
+
+  .slider-group {
+    margin-bottom: 16px;
+  }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    margin-bottom: 6px;
+    color: var(--cream-muted);
+  }
+
+  .slider-label strong {
+    color: var(--cream);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--gold);
+    cursor: pointer;
+  }
+
+  .vpd-result-card {
+    background: rgba(8, 19, 13, 0.72);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 18px;
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .vpd-number {
+    font-size: 2.1rem;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .vpd-zone-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .nutrient-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .nut-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr auto;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.03);
+    padding: 9px 12px;
+    border-radius: 10px;
+  }
+
+  .nut-row label {
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+  .nut-row label span {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--cream-muted);
+    font-weight: 400;
+  }
+
+  .nut-val {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--gold);
+    min-width: 68px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ppm-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .ppm-cell {
+    background: rgba(8, 19, 13, 0.72);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .ppm-cell .el-symbol {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--cream-muted);
+  }
+  .ppm-cell .el-ppm {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #9be7a9;
+    font-variant-numeric: tabular-nums;
+  }
+  .ppm-cell .el-mg {
+    font-size: 0.73rem;
+    color: var(--cream-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Printable Barcode Labels Showcase */
+  .label-showcase {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 36px;
+    align-items: center;
+  }
+
+  .physical-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .brother-label {
+    background: #fcfaf5;
+    color: #111;
+    border-radius: 10px;
+    padding: 16px 20px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    border-left: 6px solid #1f452b;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .brother-label h4 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    margin-bottom: 2px;
+  }
+
+  .brother-label p {
+    font-size: 0.8rem;
+    color: #444;
+    margin: 0;
+  }
+
+  .barcode-bars {
+    text-align: center;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .bars-visual {
+    height: 34px;
+    width: 132px;
+    background: repeating-linear-gradient(
+      90deg,
+      #111 0px, #111 2px,
+      transparent 2px, transparent 4px,
+      #111 4px, #111 8px,
+      transparent 8px, transparent 10px,
+      #111 10px, #111 11px,
+      transparent 11px, transparent 14px,
+      #111 14px, #111 17px,
+      transparent 17px, transparent 19px
+    );
+    margin-bottom: 3px;
+  }
+
+  .barcode-bars span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: #222;
+  }
+
+  /* Privacy & Data Sovereignty Banner */
+  .privacy-banner {
+    background: linear-gradient(135deg, rgba(31, 69, 43, 0.85) 0%, rgba(15, 35, 23, 0.95) 100%);
+    border: 1px solid rgba(227, 191, 107, 0.35);
+    border-radius: var(--radius-lg);
+    padding: 42px;
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .privacy-points {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .privacy-point {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--cream);
+  }
+
+  .check-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(94, 194, 113, 0.2);
+    color: #84e896;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  .site-footer {
+    border-top: 1px solid var(--border-subtle);
+    padding: 48px 0 64px;
+    color: var(--cream-muted);
+    font-size: 0.9rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 960px) {
+    .hero-grid,
+    .calc-wrapper,
+    .label-showcase,
+    .privacy-banner {
+      grid-template-columns: 1fr;
+    }
+    .span-7, .span-5, .span-6, .span-4, .span-8 {
+      grid-column: span 12;
+    }
+    .nav-links {
+      display: none;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .hero-pills,
+    .privacy-points,
+    .ppm-breakdown-grid {
+      grid-template-columns: 1fr;
+    }
+    .nut-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container nav-inner">
+    <a href="#" class="brand">
+      <img src="icon.jpg" alt="PlantMaxer App Icon">
+      <span>PlantMaxer</span>
+      <span class="brand-badge">iOS 17+</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#cultivation">Cultivation &amp; Feeds</a></li>
+      <li><a href="#genetics">Lineage &amp; Seed Vault</a></li>
+      <li><a href="#environment">Rooms, VPD &amp; Govee</a></li>
+      <li><a href="#calculators">Live Calculators</a></li>
+      <li><a href="#labels">Barcodes &amp; Labels</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+    </ul>
+    <a href="#download" class="btn btn-gold">Get for iPhone &amp; iPad</a>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" style="border-top: none;">
+    <div class="container hero-grid">
+      <div>
+        <div class="eyebrow">
+          <span>🌿</span> Built for Serious Cannabis Cultivators &amp; Breeders
+        </div>
+        <h1>
+          Every Plant, Feed, <span class="gold-text">Pheno &amp; Cross</span> Under Control.
+        </h1>
+        <p class="hero-lead">
+          Track veg and flower days from seed or clone, dial in pH &amp; PPM runoff drift, compute exact elemental NPK mg/ppm inputs, map multi-generation cannabis pedigrees, and log live room VPD via Govee Bluetooth sensors—100% privately on your device.
+        </p>
+        <div class="hero-actions">
+          <a href="#calculators" class="btn btn-gold">Try the Elemental &amp; VPD Math</a>
+          <a href="#genetics" class="btn btn-outline">Explore Strain Lineage &amp; Vault</a>
+        </div>
+        <div class="hero-pills">
+          <div class="hero-pill">
+            <span class="hero-pill-icon">💧</span>
+            <div>
+              <strong>pH, PPM &amp; Elemental Math</strong>
+              <span>In/out runoff drift (Δ) + exact N, P, K, Ca, Mg, Si ppm</span>
+            </div>
+          </div>
+          <div class="hero-pill">
+            <span class="hero-pill-icon">🧬</span>
+            <div>
+              <strong>Pedigree Trees &amp; Seed Boxes</strong>
+              <span>F1–F6, S1, BX1 lineage + grid coordinates (Box 1 · A11)</span>
+            </div>
+          </div>
+          <div class="hero-pill">
+            <span class="hero-pill-icon">🌡️</span>
+            <div>
+              <strong>Leaf VPD &amp; Govee BLE</strong>
+              <span>Live H5075 thermo-hygrometer logging &amp; multi-sensor charts</span>
+            </div>
+          </div>
+          <div class="hero-pill">
+            <span class="hero-pill-icon">🔒</span>
+            <div>
+              <strong>Zero Cloud Accounts</strong>
+              <span>On-device SwiftData + your private iCloud container</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE IPHONE SIMULATOR -->
+      <div class="phone-stage">
+        <div class="phone-glow"></div>
+        <div class="iphone-frame" role="region" aria-label="Interactive PlantMaxer App Preview">
+          <div class="iphone-screen">
+            <div class="ios-statusbar">
+              <span>9:41</span>
+              <div class="dynamic-island"></div>
+              <span>5G 100%</span>
+            </div>
+
+            <!-- Dynamic Screen Content -->
+            <div id="sim-screen" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Authentic Forest Green & Gold Tab Bar -->
+            <div class="ios-tabbar" role="tablist" aria-label="App Preview Tabs">
+              <button class="ios-tab active" data-tab="plants" role="tab" aria-selected="true">
+                <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>
+                <span>Plants</span>
+              </button>
+              <button class="ios-tab" data-tab="strains" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>
+                <span>Strains</span>
+              </button>
+              <button class="ios-tab" data-tab="rooms" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></svg>
+                <span>Rooms</span>
+              </button>
+              <button class="ios-tab" data-tab="nutrients" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8z"/></svg>
+                <span>Nutrients</span>
+              </button>
+              <button class="ios-tab" data-tab="organize" role="tab" aria-selected="false">
+                <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+                <span>Organize</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="screen-switcher-caption">
+          <span>👆</span> Tap the tabs on the iPhone above to explore live cannabis screens
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CULTIVATION & PRECISION FEEDING -->
+  <section id="cultivation">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Veg, Flip &amp; Precision Fertigation</div>
+        <h2 class="section-title">Dial in every feed from seedling to flush.</h2>
+        <p class="section-desc">
+          Whether you run hand-watered living soil, high-frequency coco drain-to-waste, or recirculating RDWC reservoirs, PlantMaxer tracks every input and runoff reading.
+        </p>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-card span-7">
+          <div>
+            <div class="card-tag">💧 Runoff Drift &amp; Elemental Breakdown</div>
+            <h3>Know your exact mg &amp; ppm of N, P, K, Ca, Mg &amp; Si</h3>
+            <p>
+              Log water volume, pH in/out, and PPM in/out with automatic drift calculation (Δ) so you spot root-zone salt buildup or pH crashes before leaves show deficiency. Enter each bottle or salt's guaranteed analysis % and density once—every feed computes the exact milligrams and parts per million delivered.
+            </p>
+          </div>
+          <div class="mini-ui">
+            <div class="drift-grid">
+              <div class="drift-box">
+                <small>pH In → Runoff (Δ)</small>
+                <strong>5.8 → 6.0 <span style="color:#9be7a9;">(+0.2)</span></strong>
+              </div>
+              <div class="drift-box">
+                <small>PPM In → Runoff (Δ)</small>
+                <strong>880 → 990 <span style="color:#e3bf6b;">(+110 ppm)</span></strong>
+              </div>
+            </div>
+            <div class="element-pills">
+              <span class="el-pill">N 112 ppm (448 mg)</span>
+              <span class="el-pill">P₂O₅ 65 ppm (260 mg)</span>
+              <span class="el-pill">K₂O 168 ppm (672 mg)</span>
+              <span class="el-pill">Ca 95 ppm (380 mg)</span>
+              <span class="el-pill">Mg 42 ppm (168 mg)</span>
+              <span class="el-pill">Si 28 ppm (112 mg)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card span-5">
+          <div>
+            <div class="card-tag">🌸 12/12 Flip &amp; Photo Timelapses</div>
+            <h3>Veg day, Flower day &amp; EXIF Timelapses</h3>
+            <p>
+              Flip a plant to flowering with one toggle. PlantMaxer records the flip date, counts Veg days and Flower days separately, estimates harvest windows from strain flowering weeks, and plays back full-screen photo timelapses stamped with <code>Day 49 · Flower day 21</code>.
+            </p>
+          </div>
+          <div class="mini-ui">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+              <strong>Gelato #41 (Clone)</strong>
+              <span class="stage-badge stage-flower">🌷 Flower day 28</span>
+            </div>
+            <div style="font-size:0.79rem; color:var(--cream-muted); margin-bottom:10px;">
+              Medium: Coco Drain-to-Waste · Vegged 24 days · Est. Harvest: 9 wks
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; text-align:center; font-size:0.7rem;">
+              <div style="background:rgba(255,255,255,0.06); padding:8px 4px; border-radius:6px;">🌱<br>Veg d10</div>
+              <div style="background:rgba(255,255,255,0.06); padding:8px 4px; border-radius:6px;">🌿<br>Veg d24</div>
+              <div style="background:rgba(155,48,217,0.22); padding:8px 4px; border-radius:6px;">🌸<br>Flw d14</div>
+              <div style="background:rgba(155,48,217,0.38); padding:8px 4px; border-radius:6px; border:1px solid #d79df7;">💎<br>Flw d28</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card span-6">
+          <div>
+            <div class="card-tag">📅 12-Week Feed Schedules</div>
+            <h3>Veg Weeks 1–4 &amp; Flower Weeks 1–8 Auto-Fill</h3>
+            <p>
+              Build custom nutrient schedules for soil, coco, or hydro. When you tap <strong>Log Today's Feed</strong>, PlantMaxer checks the plant's current veg or flower week and pre-fills every bottle's dose automatically—or tap <strong>Copy from Last Feed</strong> in one second.
+            </p>
+          </div>
+          <div class="mini-ui" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <span><strong>Athena / Coco Heavy</strong> · Flower Wk 4</span>
+            <span style="color:var(--gold); font-weight:700;">Bloom 2.5 ml/L · CalMag 0.8 ml/L · PK 1.0 ml/L</span>
+          </div>
+        </div>
+
+        <div class="bento-card span-6">
+          <div>
+            <div class="card-tag">🛢️ Hydro Reservoirs &amp; Whole-Room Feeds</div>
+            <h3>Feed 12 plants once, log runoff individually</h3>
+            <p>
+              Assign hydro plants to a shared Reservoir or log a whole-room feed in your Flower Tent. PlantMaxer syncs the input feed (water, pH in, PPM in, nutrients) to every plant on that reservoir or room while keeping per-plant runoff pH/PPM readings independent.
+            </p>
+          </div>
+          <div class="mini-ui" style="display:flex; justify-content:space-between; align-items:center;">
+            <span><strong>Flower Res A (100 L)</strong> → Linked to 6 plants</span>
+            <span style="color:#9be7a9; font-weight:700;">Synced ✓</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENETICS, BREEDING & SEED VAULT -->
+  <section id="genetics">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Breeding, Pheno Hunting &amp; Seed Vault</div>
+        <h2 class="section-title">Built for pollen chuckers, breeders &amp; seed collectors.</h2>
+        <p class="section-desc">
+          Map multi-generation cannabis family trees, prevent pedigree loops automatically, and organize hundreds of seed packs and home crosses down to the exact box and grid slot.
+        </p>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-card span-6">
+          <div>
+            <div class="card-tag">🧬 Mother × Father Lineage Explorer</div>
+            <h3>Interactive Pedigree Trees &amp; Offspring Tracking</h3>
+            <p>
+              Record Indica, Indica-dominant, Hybrid, Sativa-dominant, or Sativa cultivars along with breeder, flowering weeks, 1–5 star ratings, and filial generations (<code>P1, F1–F6, S1, S2, BX1–BX3, IBL, Landrace, Clone-only</code>). Pick Mother (♀) and Father (♂) strains from your library—and add parents recursively right inside the picker with automatic loop protection.
+            </p>
+          </div>
+          <div class="mini-ui lineage-tree">
+            <div class="tree-node">
+              <strong>Blue Chronic × Haze Extreme</strong>
+              <span class="gen-pill">F1</span>
+              <span style="margin-left:auto; color:var(--gold);">★★★★★</span>
+            </div>
+            <div class="tree-node indent-1">
+              <span class="sex-f">♀</span> <span>Blue Chronic</span> <span class="gen-pill">F1</span>
+            </div>
+            <div class="tree-node indent-2">
+              <span class="sex-f">♀</span> <span>Blueberry</span> <span class="gen-pill">Landrace</span>
+            </div>
+            <div class="tree-node indent-2">
+              <span class="sex-m">♂</span> <span>Chronic</span> <span class="gen-pill">IBL</span>
+            </div>
+            <div class="tree-node indent-1">
+              <span class="sex-m">♂</span> <span>Haze Extreme #2</span> <span class="gen-pill">P1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card span-6">
+          <div>
+            <div class="card-tag">📦 Seed Boxes, Grid Slots &amp; CSV Sync</div>
+            <h3>Know exactly what is in Box 1 · Slot A11</h3>
+            <p>
+              Track every seed lot by count, type (<strong>Regular, Feminized, Autoflower, Auto Fem</strong>), source, acquired date, and harvest date. Store lots in physical <strong>Seed Boxes</strong> with grid coordinates, export/import your entire vault via <strong>CSV Spreadsheets</strong>, generate a <strong>Spare Seeds List</strong> for trading, or roll the <strong>Random Strain Picker</strong> dice to choose your next run.
+            </p>
+          </div>
+          <div class="mini-ui">
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px; margin-bottom:8px;">
+              <span><strong>Blue Chronic × Cheese Auto</strong> · Fem</span>
+              <span style="color:var(--gold);">Box 1 · A11 (30 seeds)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px; margin-bottom:8px;">
+              <span><strong>Gelato Cheese × Banana Hammock</strong> · F1 Fem</span>
+              <span style="color:var(--gold);">Orange Box · C1 (15 seeds)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span><strong>Dark Angel × Haze Extreme</strong> · F1 Reg</span>
+              <span style="color:var(--gold);">Box 2 · B11, B12 (40 seeds)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GROW ROOMS, GOVEE BLUETOOTH SENSORS & POWER -->
+  <section id="environment">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Environment, Bluetooth Sensors &amp; Power</div>
+        <h2 class="section-title">Live Govee VPD logging &amp; true kWh electricity costs.</h2>
+        <p class="section-desc">
+          Pair Govee H5075 Bluetooth thermo-hygrometers to your rooms, compute leaf-offset VPD automatically, and track every watt across 18/6 veg and 12/12 flower photoperiod flips.
+        </p>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-card span-4">
+          <div>
+            <div class="card-tag">📡 Govee H5075 Bluetooth</div>
+            <h3>Live BLE Sensor Advertisements &amp; History Sync</h3>
+            <p>
+              Assign one or multiple Govee Bluetooth sensors to a grow room. PlantMaxer averages live canopy temperature, RH%, and VPD across your room's sensors, monitors battery levels, logs readings automatically at 5, 15, 30, or 60-minute intervals, and charts a line per sensor.
+            </p>
+          </div>
+          <div class="mini-ui">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span><strong>Canopy Top (H5075)</strong></span>
+              <span style="color:#9be7a9;">25.2 °C · 56% RH</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span><strong>Lower Canopy (H5075)</strong></span>
+              <span style="color:#9be7a9;">24.1 °C · 60% RH</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-card span-4">
+          <div>
+            <div class="card-tag">🍃 True Leaf VPD, CO₂ &amp; PPFD</div>
+            <h3>Canopy Leaf Temp Offset &amp; Light Checks</h3>
+            <p>
+              Log air temperature, relative humidity, IR gun leaf temperature, CO₂ (ppm), and canopy light intensity (PPFD µmol/m²/s). When leaf temperature is entered, PlantMaxer computes true <strong>Leaf VPD (kPa)</strong> using the Tetens vapor pressure equation instead of air VPD alone.
+            </p>
+          </div>
+          <div class="mini-ui">
+            <div style="color:var(--gold); font-weight:700; margin-bottom:4px;">25.0 °C · 55% RH · Leaf 23.8 °C</div>
+            <div style="font-size:0.8rem; color:var(--cream-muted);">Leaf VPD: <strong>1.19 kPa</strong> · CO₂ 1,050 ppm · 880 PPFD</div>
+          </div>
+        </div>
+
+        <div class="bento-card span-4">
+          <div>
+            <div class="card-tag">⚡ Equipment &amp; Photoperiod kWh</div>
+            <h3>Flip from 18h to 12h without losing history</h3>
+            <p>
+              Log LEDs, inline fans, dehumidifiers, and AC units with wattage and hours/day. When you flip a tent from 18 hours to 12 hours, PlantMaxer keeps the historical schedule change so your kWh usage and electricity cost reports stay exact for Today, 7d, 30d, and All Time.
+            </p>
+          </div>
+          <div class="mini-ui">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span>Bar LED 680W (12h/day)</span>
+              <span style="color:var(--gold);">8.16 kWh/d</span>
+            </div>
+            <div style="font-size:0.78rem; color:var(--cream-muted);">30-day room cost @ $0.14/kWh: <strong>$41.80</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE INTERACTIVE CALCULATORS -->
+  <section id="calculators">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-kicker">Interactive PlantMaxer Math</div>
+        <h2 class="section-title">Test-drive PlantMaxer's VPD &amp; Elemental engines.</h2>
+        <p class="section-desc">
+          These interactive calculators run the exact same Tetens vapor pressure and guaranteed-analysis elemental conversion formulas built into the iOS app.
+        </p>
+      </div>
+
+      <div class="calc-wrapper">
+        <!-- Calculator 1: Leaf & Air VPD -->
+        <div class="calc-panel">
+          <div class="calc-header">
+            <h3>🌡️ Canopy &amp; Leaf VPD Calculator</h3>
+            <div class="unit-toggle" role="group" aria-label="Temperature Unit">
+              <button type="button" id="btn-c" class="active">°C</button>
+              <button type="button" id="btn-f">°F</button>
+            </div>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Air Temperature</span>
+              <strong id="lbl-air-temp">25.0 °C</strong>
+            </div>
+            <input type="range" id="rng-air" min="15" max="35" step="0.5" value="25">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Relative Humidity (RH)</span>
+              <strong id="lbl-rh">55 %</strong>
+            </div>
+            <input type="range" id="rng-rh" min="25" max="85" step="1" value="55">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Canopy Leaf Temp Offset</span>
+              <strong id="lbl-leaf-offset">-1.5 °C (Leaf: 23.5 °C)</strong>
+            </div>
+            <input type="range" id="rng-leaf" min="-4" max="2" step="0.5" value="-1.5">
+          </div>
+
+          <div class="vpd-result-card">
+            <div>
+              <div style="font-size:0.76rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--cream-muted);">True Leaf VPD</div>
+              <div class="vpd-number" id="out-leaf-vpd">1.14 kPa</div>
+              <div style="font-size:0.8rem; color:var(--cream-muted); margin-top:2px;">
+                Air VPD: <strong id="out-air-vpd" style="color:var(--cream);">1.43 kPa</strong>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="vpd-zone-badge" id="out-vpd-zone" style="background:rgba(94,194,113,0.2); color:#9be7a9; border:1px solid rgba(94,194,113,0.4);">
+                Ideal Late Veg / Early Flower
+              </span>
+              <div style="font-size:0.75rem; color:var(--cream-muted); margin-top:6px;" id="out-vpd-advice">
+                Target: 0.8–1.2 kPa (Veg) · 1.2–1.6 kPa (Flower)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculator 2: Elemental PPM & mg Breakdown -->
+        <div class="calc-panel">
+          <div class="calc-header">
+            <h3>🧪 Elemental NPK + Ca/Mg/Si Breakdown</h3>
+            <span style="font-size:0.78rem; color:var(--gold); font-weight:600;">Water Volume: <span id="lbl-water">4.0 L</span></span>
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Feed Water Volume (Litres)</span>
+              <strong id="lbl-water-slider">4.0 L (1.06 US gal)</strong>
+            </div>
+            <input type="range" id="rng-water" min="1" max="20" step="0.5" value="4">
+          </div>
+
+          <div class="nutrient-rows">
+            <div class="nut-row">
+              <label>
+                Core Grow (3-1-4, 0.5% Mg)
+                <span>Density 1.20 g/ml</span>
+              </label>
+              <input type="range" id="rng-grow" min="0" max="4" step="0.25" value="1.5">
+              <div class="nut-val" id="lbl-grow">1.50 ml/L</div>
+            </div>
+
+            <div class="nut-row">
+              <label>
+                Core Bloom (1-5-6, 1% S)
+                <span>Density 1.25 g/ml</span>
+              </label>
+              <input type="range" id="rng-bloom" min="0" max="4" step="0.25" value="2.0">
+              <div class="nut-val" id="lbl-bloom">2.00 ml/L</div>
+            </div>
+
+            <div class="nut-row">
+              <label>
+                CalMag (4% Ca, 1.5% Mg)
+                <span>Density 1.30 g/ml</span>
+              </label>
+              <input type="range" id="rng-calmag" min="0" max="3" step="0.25" value="0.75">
+              <div class="nut-val" id="lbl-calmag">0.75 ml/L</div>
+            </div>
+
+            <div class="nut-row">
+              <label>
+                Potassium Silicate (7% Si, 3% K₂O)
+                <span>Density 1.15 g/ml</span>
+              </label>
+              <input type="range" id="rng-silica" min="0" max="2" step="0.1" value="0.4">
+              <div class="nut-val" id="lbl-silica">0.40 ml/L</div>
+            </div>
+          </div>
+
+          <div class="ppm-breakdown-grid" id="ppm-grid">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BARCODE LABELS & THERMAL PRINTING -->
+  <section id="labels">
+    <div class="container label-showcase">
+      <div>
+        <div class="section-kicker">Code 128 Barcodes &amp; Camera Scanner</div>
+        <h2 class="section-title">Print Brother DK labels. Scan any pot or seed vial.</h2>
+        <p class="section-desc" style="margin-bottom:20px;">
+          Every plant, strain, seed lot, and storage box in PlantMaxer gets a unique Code 128 barcode (<code>P7KQ2MX</code>, <code>S9M4K2P</code>, <code>L3X8N1Q</code>). Print individual or batch labels straight from iOS in standard <strong>17 × 54 mm</strong> (seed vials &amp; plant stakes) or <strong>62 × 100 mm</strong> (pots &amp; full seed box manifests).
+        </p>
+        <p class="section-desc">
+          Tap the camera scan button on the Plants or Strains tab and point your iPhone at a label to jump straight to that plant's feed log or strain pedigree.
+        </p>
+      </div>
+
+      <div class="physical-labels">
+        <div class="brother-label">
+          <div>
+            <span style="font-size:0.68rem; font-weight:700; text-transform:uppercase; color:#1f452b;">17 × 54 mm Plant Stake Label</span>
+            <h4>Blue Dream #1</h4>
+            <p>Blue Dream F1 · Started Oct 14, 2026</p>
+          </div>
+          <div class="barcode-bars">
+            <div class="bars-visual"></div>
+            <span>P7KQ2MX</span>
+          </div>
+        </div>
+
+        <div class="brother-label">
+          <div>
+            <span style="font-size:0.68rem; font-weight:700; text-transform:uppercase; color:#9b30d9;">17 × 54 mm Seed Vial Label</span>
+            <h4>Crown Royal × Haze Extreme</h4>
+            <p>Regular seeds · F1 · Box 1 · A10</p>
+          </div>
+          <div class="barcode-bars">
+            <div class="bars-visual"></div>
+            <span>L4M9R2V</span>
+          </div>
+        </div>
+
+        <div class="brother-label">
+          <div>
+            <span style="font-size:0.68rem; font-weight:700; text-transform:uppercase; color:#b08021;">62 × 100 mm Seed Box Manifest</span>
+            <h4>Vault Box 1 — Dank Bank</h4>
+            <p>18 lots · 342 seeds · A1–F12 indexed</p>
+          </div>
+          <div class="barcode-bars">
+            <div class="bars-visual"></div>
+            <span>B2K8W4Z</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY & DOWNLOAD CTA -->
+  <section id="download">
+    <div class="container">
+      <div class="privacy-banner">
+        <div>
+          <div class="section-kicker">100% Private by Architecture</div>
+          <h2 class="section-title" style="margin-bottom:12px;">Your grow never touches our servers.</h2>
+          <p class="section-desc">
+            PlantMaxer has no accounts, no sign-ups, no analytics SDKs, and no third-party servers. Everything is stored locally on your iPhone and iPad using Apple SwiftData, optionally synced across your own devices through your encrypted private iCloud container, and exportable anytime as a full JSON backup or CSV seed inventory.
+          </p>
+          <div class="privacy-points">
+            <div class="privacy-point"><span class="check-dot">✓</span> No user accounts or logins</div>
+            <div class="privacy-point"><span class="check-dot">✓</span> Zero analytics or telemetry</div>
+            <div class="privacy-point"><span class="check-dot">✓</span> Private CloudKit device sync</div>
+            <div class="privacy-point"><span class="check-dot">✓</span> Full JSON &amp; CSV data export</div>
+          </div>
+        </div>
+
+        <div style="text-align:center; background:rgba(8,19,13,0.65); padding:32px 24px; border-radius:18px; border:1px solid var(--border-subtle);">
+          <img src="icon.jpg" alt="PlantMaxer Icon" style="width:84px; height:84px; border-radius:20px; margin-bottom:14px; box-shadow:0 10px 28px rgba(0,0,0,0.5);">
+          <h3 style="font-size:1.35rem; margin-bottom:6px;">PlantMaxer for iOS</h3>
+          <p style="font-size:0.88rem; color:var(--cream-muted); margin-bottom:20px;">
+            Requires iOS 17+ · Universal for iPhone &amp; iPad · Native SwiftUI &amp; SwiftData
+          </p>
+          <a href="privacy.html" class="btn btn-gold" style="width:100%; margin-bottom:10px;">
+            Read Our Zero-Tracking Privacy Policy
+          </a>
+          <div style="font-size:0.76rem; color:var(--cream-muted);">
+            Rated 18+ · Available on the Apple App Store
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <img src="icon.jpg" alt="" style="width:28px; height:28px; border-radius:7px;">
+      <strong>PlantMaxer</strong>
+      <span>© 2026 PlantMaxer. All rights reserved.</span>
+    </div>
+    <div class="footer-links">
+      <a href="#cultivation">Cultivation</a>
+      <a href="#genetics">Lineage &amp; Seeds</a>
+      <a href="#environment">Rooms &amp; VPD</a>
+      <a href="#calculators">Calculators</a>
+      <a href="privacy.html">Privacy Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // 1. INTERACTIVE IPHONE APP PREVIEW SCREENS
+  const screens = {
+    plants: `
+      <div class="ios-toolbar">
+        <span class="ios-circle-btn" title="Manage Rooms">🏠</span>
+        <div class="ios-pill-actions">
+          <span>＋</span>
+          <span>🎲</span>
+          <span>⎔</span>
+        </div>
+      </div>
+      <div class="ios-title">PlantMaxer</div>
+      <div class="ios-body">
+        <div class="ios-section-label"><span>Flower Tent 4×4</span><span>4</span></div>
+        <div class="ios-card">
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">Blue Dream #1</span>
+              <span class="stage-badge stage-flower">🌷 Clone · Flower day 34</span>
+            </div>
+            <div class="ios-sub">Blue Dream · Coco ·Res A</div>
+            <div class="ios-meta">Last fed 6h ago · pH 5.8 → 6.0 · 920 ppm</div>
+          </div>
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">Gelato 41 × OG Kush</span>
+              <span class="stage-badge stage-flower">🌷 Seed · Flower day 34</span>
+            </div>
+            <div class="ios-sub">Dream OG F1 · Coco</div>
+            <div class="ios-meta">Last fed 6h ago · pH 5.9 → 6.1 · 940 ppm</div>
+          </div>
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">Bubba × Pineapple #3</span>
+              <span class="stage-badge stage-flower">🌷 Seed · Flower day 21</span>
+            </div>
+            <div class="ios-sub">Bubba Kush × Pineapple Express</div>
+            <div class="ios-meta">Last fed yesterday · pH 6.2 · 860 ppm</div>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Veg &amp; Mothers</span><span>2</span></div>
+        <div class="ios-card">
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">Chem D Keeper Mom</span>
+              <span class="stage-badge stage-veg">🍃 Clone · Veg day 68</span>
+            </div>
+            <div class="ios-sub">Chemdog D (Clone-only) · Soil</div>
+            <div class="ios-meta">Last fed yesterday · pH 6.3 · 680 ppm</div>
+          </div>
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">Cheese Auto #2</span>
+              <span class="stage-badge stage-veg">🍃 Seed · Veg day 18</span>
+            </div>
+            <div class="ios-sub">Cheese Auto (Auto Fem)</div>
+            <div class="ios-meta">Last fed 2 days ago · pH 6.1 · 540 ppm</div>
+          </div>
+        </div>
+      </div>
+    `,
+    strains: `
+      <div class="ios-toolbar">
+        <span class="ios-circle-btn">‹</span>
+        <div class="ios-pill-actions">
+          <span>🖨️ Label</span>
+          <span>Edit</span>
+        </div>
+      </div>
+      <div class="ios-title">Crown Royal × Haze</div>
+      <div class="ios-body">
+        <div class="ios-card">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">Barcode</span><strong style="font-size:0.84rem;">S9M4K2P</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">Plant / Type</span><strong style="font-size:0.84rem;">Cannabis · Sativa-dominant</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">Generation &amp; Flower</span><strong style="font-size:0.84rem;">F1 · 9.5 weeks</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">Rating</span><span style="color:#d49a2a;">★★★★★</span>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Lineage &amp; Family Tree</span></div>
+        <div class="ios-card" style="font-size:0.82rem;">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span><strong style="color:#d6458b;">♀</strong> Mother</span>
+            <span><strong>Crown Royal</strong> <span class="stage-badge stage-flower">F1</span> ›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span><strong style="color:#2b82d9;">♂</strong> Father</span>
+            <span><strong>Haze Extreme #2</strong> <span class="stage-badge stage-veg">P1</span> ›</span>
+          </div>
+          <div class="ios-row" style="line-height:1.7; padding-top:6px;">
+            <div><strong style="color:#d6458b;">♀</strong> Crown Royal <span class="stage-badge stage-flower">F1</span></div>
+            <div style="padding-left:16px;"><strong style="color:#d6458b;">♀</strong> Blueberry × <strong style="color:#2b82d9;">♂</strong> Purple Kush</div>
+            <div><strong style="color:#2b82d9;">♂</strong> Haze Extreme #2 <span class="stage-badge stage-veg">Landrace</span></div>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Seed Inventory (2 Lots · 65 Seeds)</span></div>
+        <div class="ios-card">
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">25 Regular seeds</span>
+              <span class="stage-badge stage-veg">Box 1 · A10</span>
+            </div>
+            <div class="ios-meta">L4M9R2V · Harvested Nov 2026 · Chucking run</div>
+          </div>
+        </div>
+      </div>
+    `,
+    rooms: `
+      <div class="ios-toolbar">
+        <span class="ios-circle-btn">‹</span>
+        <div class="ios-pill-actions">
+          <span>＋ Reading</span>
+          <span>＋ Feed Room</span>
+        </div>
+      </div>
+      <div class="ios-title">Flower Tent 4×4</div>
+      <div class="ios-body">
+        <div class="ios-section-label"><span>Live Environment (2 Govee H5075)</span></div>
+        <div class="ios-card">
+          <div class="ios-row">
+            <div class="ios-row-top">
+              <span class="ios-plant-name">24.8 °C · 54% RH · VPD 1.32 kPa</span>
+            </div>
+            <div class="ios-sub">Leaf 23.6 °C · CO₂ 1,050 ppm · 890 PPFD</div>
+            <div class="ios-meta">📡 Canopy Top (92% 🔋) + Lower Canopy (88% 🔋)</div>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Electricity &amp; Equipment (12h Flip)</span></div>
+        <div class="ios-card">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <div>
+              <div class="ios-plant-name">680W Bar LED</div>
+              <div class="ios-meta">Switched 18h → 12h on Oct 8</div>
+            </div>
+            <strong style="font-size:0.84rem; color:#1f452b;">8.16 kWh/d</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <div>
+              <div class="ios-plant-name">AC Infinity T6 + Osc Fans</div>
+              <div class="ios-meta">65W · 24h/day</div>
+            </div>
+            <strong style="font-size:0.84rem; color:#1f452b;">1.56 kWh/d</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">30-Day Room Power Cost</span>
+            <strong style="color:#b55433;">291 kWh · $40.82</strong>
+          </div>
+        </div>
+      </div>
+    `,
+    nutrients: `
+      <div class="ios-toolbar">
+        <span class="ios-circle-btn">✕</span>
+        <div class="ios-pill-actions">
+          <span>Save Feed</span>
+        </div>
+      </div>
+      <div class="ios-title">Log Feed — Flower Wk 5</div>
+      <div class="ios-body">
+        <div class="ios-card">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">Water Volume</span><strong>4.0 L (1.06 gal)</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">pH In → Runoff Out</span><strong>5.8 → 6.0 (+0.2)</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span class="ios-sub">PPM In → Runoff Out</span><strong>890 → 980 (+90)</strong>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Schedule Doses (Coco Heavy)</span></div>
+        <div class="ios-card">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span><strong>Core Bloom</strong> (1-5-6)</span><span>2.2 ml/L</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span><strong>Core Grow</strong> (3-1-4)</span><span>1.0 ml/L</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span><strong>CalMag</strong> (4% Ca, 1.5% Mg)</span><span>0.8 ml/L</span>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Inputs (Elemental Breakdown)</span></div>
+        <div class="ios-card" style="font-size:0.81rem;">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>Nitrogen (N)</span><strong>254 mg (63 ppm)</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>Phosphate (P₂O₅)</span><strong>598 mg (150 ppm)</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>Potash (K₂O)</span><strong>852 mg (213 ppm)</strong>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>Calcium (Ca) / Magnesium (Mg)</span><strong>166 mg (42 ppm) / 86 mg (22 ppm)</strong>
+          </div>
+        </div>
+      </div>
+    `,
+    organize: `
+      <div class="ios-toolbar">
+        <span></span>
+        <div class="ios-pill-actions"><span>iCloud Synced ✓</span></div>
+      </div>
+      <div class="ios-title">Organize</div>
+      <div class="ios-body">
+        <div class="ios-section-label"><span>Reports &amp; Analytics</span></div>
+        <div class="ios-card">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>📊 Seed Inventory &amp; Charts</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>🗃️ Seeds by Box (A1–F12)</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>🎁 Spare Seeds Trade List</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>🌿 Plants Overview &amp; Est. Harvests</span><span>›</span>
+          </div>
+        </div>
+
+        <div class="ios-section-label"><span>Storage, Archive &amp; Hardware</span></div>
+        <div class="ios-card">
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>📦 Seed Boxes</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>🫙 Harvested Archive (By Month)</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>🖨️ Print Code 128 Barcode Labels</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>📡 Govee Bluetooth Sensors</span><span>›</span>
+          </div>
+          <div class="ios-row" style="display:flex; justify-content:space-between;">
+            <span>💾 JSON Backup &amp; CSV Import/Export</span><span>›</span>
+          </div>
+        </div>
+      </div>
+    `
+  };
+
+  const simScreen = document.getElementById('sim-screen');
+  const tabButtons = document.querySelectorAll('.ios-tab');
+
+  function renderTab(tabName) {
+    simScreen.innerHTML = screens[tabName] || screens.plants;
+    tabButtons.forEach(btn => {
+      const active = btn.dataset.tab === tabName;
+      btn.classList.toggle('active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  }
+
+  tabButtons.forEach(btn => {
+    btn.addEventListener('click', () => renderTab(btn.dataset.tab));
+  });
+  renderTab('plants');
+
+  // 2. LIVE VPD CALCULATOR (Tetens equation matching RoomReading.swift)
+  let useFahrenheit = false;
+  const rngAir = document.getElementById('rng-air');
+  const rngRh = document.getElementById('rng-rh');
+  const rngLeaf = document.getElementById('rng-leaf');
+  const btnC = document.getElementById('btn-c');
+  const btnF = document.getElementById('btn-f');
+
+  function saturationPressure(celsius) {
+    return 0.6108 * Math.exp((17.27 * celsius) / (celsius + 237.3));
+  }
+
+  function formatTemp(celsius, isDelta = false) {
+    if (!useFahrenheit) {
+      const sign = isDelta && celsius > 0 ? '+' : '';
+      return `${sign}${celsius.toFixed(1)} °C`;
+    }
+    if (isDelta) {
+      const dF = celsius * 9 / 5;
+      const sign = dF > 0 ? '+' : '';
+      return `${sign}${dF.toFixed(1)} °F`;
+    }
+    const f = celsius * 9 / 5 + 32;
+    return `${f.toFixed(1)} °F`;
+  }
+
+  function updateVPD() {
+    const airC = parseFloat(rngAir.value);
+    const rh = parseFloat(rngRh.value);
+    const offsetC = parseFloat(rngLeaf.value);
+    const leafC = airC + offsetC;
+
+    const airVapour = saturationPressure(airC) * (rh / 100);
+    const airVpd = Math.max(saturationPressure(airC) - airVapour, 0);
+    const leafVpd = Math.max(saturationPressure(leafC) - airVapour, 0);
+
+    document.getElementById('lbl-air-temp').textContent = formatTemp(airC);
+    document.getElementById('lbl-rh').textContent = `${rh.toFixed(0)} %`;
+    document.getElementById('lbl-leaf-offset').textContent = `${formatTemp(offsetC, true)} (Leaf: ${formatTemp(leafC)})`;
+    document.getElementById('out-leaf-vpd').textContent = `${leafVpd.toFixed(2)} kPa`;
+    document.getElementById('out-air-vpd').textContent = `${airVpd.toFixed(2)} kPa`;
+
+    const badge = document.getElementById('out-vpd-zone');
+    if (leafVpd < 0.45) {
+      badge.textContent = 'Low VPD — Mold Risk in Flower';
+      badge.style.background = 'rgba(100, 180, 255, 0.2)';
+      badge.style.color = '#99d1ff';
+      badge.style.borderColor = 'rgba(100, 180, 255, 0.4)';
+    } else if (leafVpd <= 0.85) {
+      badge.textContent = 'Ideal Clone / Early Veg Zone';
+      badge.style.background = 'rgba(94, 194, 113, 0.2)';
+      badge.style.color = '#9be7a9';
+      badge.style.borderColor = 'rgba(94, 194, 113, 0.4)';
+    } else if (leafVpd <= 1.25) {
+      badge.textContent = 'Ideal Late Veg / Early Flower';
+      badge.style.background = 'rgba(94, 194, 113, 0.25)';
+      badge.style.color = '#9be7a9';
+      badge.style.borderColor = 'rgba(94, 194, 113, 0.45)';
+    } else if (leafVpd <= 1.60) {
+      badge.textContent = 'Ideal Mid–Late Flower Ripening';
+      badge.style.background = 'rgba(227, 191, 107, 0.22)';
+      badge.style.color = '#f2d488';
+      badge.style.borderColor = 'rgba(227, 191, 107, 0.45)';
+    } else {
+      badge.textContent = 'High VPD — Stomata / Heat Stress';
+      badge.style.background = 'rgba(181, 84, 51, 0.28)';
+      badge.style.color = '#ffb399';
+      badge.style.borderColor = 'rgba(181, 84, 51, 0.5)';
+    }
+  }
+
+  [rngAir, rngRh, rngLeaf].forEach(el => el.addEventListener('input', updateVPD));
+  btnC.addEventListener('click', () => {
+    useFahrenheit = false;
+    btnC.classList.add('active');
+    btnF.classList.remove('active');
+    updateVPD();
+  });
+  btnF.addEventListener('click', () => {
+    useFahrenheit = true;
+    btnF.classList.add('active');
+    btnC.classList.remove('active');
+    updateVPD();
+  });
+  updateVPD();
+
+  // 3. LIVE ELEMENTAL PPM & MG CALCULATOR (Matching InputTotals.swift)
+  const rngWater = document.getElementById('rng-water');
+  const rngGrow = document.getElementById('rng-grow');
+  const rngBloom = document.getElementById('rng-bloom');
+  const rngCalmag = document.getElementById('rng-calmag');
+  const rngSilica = document.getElementById('rng-silica');
+
+  function updateNutrients() {
+    const waterL = parseFloat(rngWater.value);
+    const growMlPerL = parseFloat(rngGrow.value);
+    const bloomMlPerL = parseFloat(rngBloom.value);
+    const calmagMlPerL = parseFloat(rngCalmag.value);
+    const silicaMlPerL = parseFloat(rngSilica.value);
+
+    document.getElementById('lbl-water').textContent = `${waterL.toFixed(1)} L`;
+    document.getElementById('lbl-water-slider').textContent = `${waterL.toFixed(1)} L (${(waterL / 3.785411784).toFixed(2)} US gal)`;
+    document.getElementById('lbl-grow').textContent = `${growMlPerL.toFixed(2)} ml/L`;
+    document.getElementById('lbl-bloom').textContent = `${bloomMlPerL.toFixed(2)} ml/L`;
+    document.getElementById('lbl-calmag').textContent = `${calmagMlPerL.toFixed(2)} ml/L`;
+    document.getElementById('lbl-silica').textContent = `${silicaMlPerL.toFixed(2)} ml/L`;
+
+    // Product grams = ml/L * waterL * density
+    const gGrow = growMlPerL * waterL * 1.20;
+    const gBloom = bloomMlPerL * waterL * 1.25;
+    const gCalmag = calmagMlPerL * waterL * 1.30;
+    const gSilica = silicaMlPerL * waterL * 1.15;
+
+    const totalsMg = {
+      'N': (gGrow * 0.03 + gBloom * 0.01) * 1000,
+      'P₂O₅': (gGrow * 0.01 + gBloom * 0.05) * 1000,
+      'K₂O': (gGrow * 0.04 + gBloom * 0.06 + gSilica * 0.03) * 1000,
+      'Ca': (gCalmag * 0.04) * 1000,
+      'Mg': (gGrow * 0.005 + gCalmag * 0.015) * 1000,
+      'Si': (gSilica * 0.07) * 1000
+    };
+
+    const grid = document.getElementById('ppm-grid');
+    grid.innerHTML = Object.entries(totalsMg).map(([name, mg]) => {
+      const ppm = mg / waterL;
+      const mgFormatted = mg >= 1000 ? `${(mg / 1000).toFixed(2)} g` : `${mg.toFixed(0)} mg`;
+      return `
+        <div class="ppm-cell">
+          <div class="el-symbol">${name}</div>
+          <div class="el-ppm">${ppm.toFixed(0)} ppm</div>
+          <div class="el-mg">${mgFormatted} total</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  [rngWater, rngGrow, rngBloom, rngCalmag, rngSilica].forEach(el => el.addEventListener('input', updateNutrients));
+  updateNutrients();
+</script>
+</body>
+</html>
